@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DealKaro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--cb:#0E1033;--cb2:#FF2D87;--or:#FFC400;--pk:#FF2D87;--paper:#FFF8E1;--card:#fff;--ink:#0E1033;--mute:#5E6285;--line:#F1DFA0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0A0C26;--card:#151A45;--ink:#F3F3FF;--mute:#A9AED6;--line:#2A3170}}
+:root[data-theme="dark"]{--paper:#0A0C26;--card:#151A45;--ink:#F3F3FF;--mute:#A9AED6;--line:#2A3170}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--cb);font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;justify-content:center}
+h1,h2,h3,.d{font-family:'Bricolage Grotesque',sans-serif}
+#app{width:100%;max-width:430px;height:100%;position:relative;overflow:hidden;background:var(--paper)}
+.scr{position:absolute;inset:0;display:none;flex-direction:column}
+.scr.on{display:flex}
+button{font:inherit;cursor:pointer;border:0}
+button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+#splash{background:var(--cb);align-items:center;justify-content:center;color:#fff;gap:14px}
+.coin{width:96px;height:96px;border-radius:50%;background:var(--or);color:#0E1033;display:grid;place-items:center;font:800 54px 'Bricolage Grotesque';box-shadow:inset 0 0 0 7px #FFE27A,0 8px 0 #C99700;animation:flip 1.4s ease-in-out}
+@keyframes flip{0%{transform:rotateY(0) translateY(-120px);opacity:0}40%{opacity:1}100%{transform:rotateY(1080deg) translateY(0)}}
+#splash p{opacity:.85}
+.ob{background:var(--cb);color:#fff;padding:24px}
+.skip{align-self:flex-end;background:none;color:#fff;opacity:.85;padding:8px}
+.slides{flex:1;position:relative}
+.sl{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;gap:18px}
+.sl.on{display:flex}
+.sl h2{font-size:34px;line-height:1.1;font-weight:800}
+.sl p{font-size:17px;opacity:.9;max-width:30ch}
+.art{height:200px;position:relative}
+.stub{position:absolute;background:var(--card);color:var(--ink);border-radius:14px;padding:12px 16px;font:800 18px 'Bricolage Grotesque';box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.dots{display:flex;gap:8px;margin:12px 0}
+.dots i{width:10px;height:10px;border-radius:5px;background:#fff5;transition:.2s}
+.dots i.on{width:28px;background:var(--or)}
+.btn{background:var(--or);color:#0E1033;font:800 18px 'Bricolage Grotesque';padding:14px;border-radius:14px;width:100%;box-shadow:0 5px 0 #C99700}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #C99700}
+.login{background:var(--cb);color:#fff;padding:28px;justify-content:center;gap:16px}
+.login h2{font-size:32px;font-weight:800}
+.ph{display:flex;background:#fff;border-radius:14px;overflow:hidden}
+.ph span{padding:14px;background:#DDE3FF;color:var(--cb);font-weight:700}
+.ph input{flex:1;border:0;padding:14px;font:500 18px 'DM Sans';color:#0E1A3A;min-width:0}
+.ph input.code{letter-spacing:.5em;text-align:center;font-weight:700;font-size:24px}
+.err{color:#FFD0E0;font-size:14px;min-height:18px}
+.lnk{background:none;color:#fff;text-decoration:underline;padding:6px;align-self:flex-start}
+.fine{font-size:13px;opacity:.8}
+.top{background:var(--cb);color:#fff;padding:14px 18px 54px;display:flex;justify-content:space-between;align-items:center}
+.top h3{font-size:22px;font-weight:800}
+.wal{background:var(--or);color:#0E1033;border-radius:20px;padding:6px 14px;font:800 17px 'Bricolage Grotesque'}
+.body{flex:1;overflow-y:auto;padding:0 16px 16px;margin-top:-40px}
+.scratch{position:relative;height:120px;border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 6px 0 var(--line);display:grid;place-items:center;text-align:center;margin-bottom:18px}
+.scratch .rv{font:800 30px 'Bricolage Grotesque';color:var(--pk)}
+.scratch small{color:var(--mute)}
+.scratch canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.chip{flex:none;padding:8px 16px;border-radius:20px;background:var(--card);color:var(--ink);border:1.5px solid var(--line);font-weight:500}
+.chip.on{background:var(--cb2);border-color:var(--cb2);color:#fff}
+.tk{display:flex;background:var(--card);border-radius:16px;margin-bottom:12px;position:relative;box-shadow:0 4px 0 var(--line)}
+.tk .l{flex:1;padding:14px 16px}
+.tk .l b{font:800 18px 'Bricolage Grotesque';display:block}
+.tk .l span{color:var(--mute);font-size:14px}
+.tk .r{width:104px;border-left:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px}
+.tk .r em{font:800 22px 'Bricolage Grotesque';font-style:normal;color:var(--pk);line-height:1}
+.tk .r button{background:var(--cb2);color:#fff;border-radius:10px;padding:5px 12px;font-weight:700;font-size:14px}
+.tk:before,.tk:after{content:"";position:absolute;right:92px;width:20px;height:20px;border-radius:50%;background:var(--paper)}
+.tk:before{top:-10px}.tk:after{bottom:-10px}
+.nav{display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 4px}
+.nav button{flex:1;background:none;color:var(--mute);padding:8px 0;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button b{font-size:20px;line-height:1}
+.nav button.on{color:var(--cb2);font-weight:700}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.lgin{animation:lgin .6s ease both}@keyframes lgin{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.fc{position:absolute;left:50%;top:60%;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:var(--or);color:var(--cb);display:grid;place-items:center;font:800 18px 'Bricolage Grotesque';box-shadow:0 3px 0 #C99700;z-index:6;animation:fly .9s ease-in forwards;pointer-events:none}
+@keyframes fly{0%{transform:scale(.4);opacity:0}20%{opacity:1;transform:scale(1)}100%{transform:translate(110px,-420px) scale(.5);opacity:0}}
+.adov{position:absolute;inset:0;background:rgba(14,26,58,.94);color:#fff;display:none;align-items:center;justify-content:center;text-align:center;z-index:5}.adov.on{display:flex}
+.pg{display:none}.pg.on{display:block}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.out{margin-top:16px;background:var(--card);color:var(--pk);border:1.5px solid var(--line);border-radius:12px;padding:10px 20px;font-weight:700}
+@media (prefers-reduced-motion:reduce){.coin{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<section class="scr on" id="splash">
+  <div class="coin" id="coin">₹</div>
+  <div id="lg" style="display:none;text-align:center;font:800 54px 'Bricolage Grotesque',sans-serif;color:#fff">Deal<span style="color:#FFC400">Karo</span><div style="font:500 16px 'DM Sans',sans-serif;opacity:.8">Best deals • Big savings</div></div>
+  <p>Loading…</p>
+</section>
+
+<section class="scr ob" id="ob">
+  <button class="skip" onclick="go('login')">Skip</button>
+  <div class="slides">
+    <div class="sl on"><div class="art"><div class="stub" style="left:0;top:30px;transform:rotate(-6deg)">Fashion 40% off</div><div class="stub" style="left:70px;top:90px;transform:rotate(4deg)">Mobiles ₹2,000 off</div></div>
+      <h2>All your deals in one place</h2><p>Fresh offers from top stores, every single day.</p></div>
+    <div class="sl"><div class="art"><div class="stub" style="left:20px;top:20px;transform:rotate(-3deg);color:#FF3D81">Cashback ₹86</div><div class="stub" style="left:110px;top:100px;transform:rotate(5deg)">Added to wallet ✓</div></div>
+      <h2>Shop through us, get cashback</h2><p>Buy using our links and the money lands in your wallet.</p></div>
+    <div class="sl"><div class="art"><div class="stub" style="left:10px;top:40px;transform:rotate(4deg)">Friend joined +₹25</div><div class="stub" style="left:80px;top:105px;transform:rotate(-5deg)">Free daily scratch card</div></div>
+      <h2>Invite friends, earn more</h2><p>Bonus on every referral and a free scratch card each day.</p></div>
+  </div>
+  <div class="dots"><i class="on"></i><i></i><i></i></div>
+  <button class="btn" id="next">Next</button>
+</section>
+
+<section class="scr login" id="login">
+  <h2 id="lt">Sign in</h2>
+  <p class="fine" id="ls" style="font-size:16px;opacity:.9">Welcome back. Log in to see your wallet.</p>
+  <div class="ph"><input id="em" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address"></div>
+  <div class="ph"><input id="pw" type="password" autocomplete="current-password" placeholder="Password (min 6 characters)" aria-label="Password"></div>
+  <div class="err" id="e1"></div>
+  <button class="btn" id="send">Sign in</button>
+  <button class="lnk" id="tog">New here? Create an account</button>
+  <button class="lnk" id="forgot">Forgot password?</button>
+  <p class="fine">By continuing you agree to our Terms and Privacy Policy.</p>
+</section>
+
+<section class="scr" id="home">
+  <div class="top"><h3>Deal<span style="color:#FFC400">Karo</span></h3><div class="wal">₹<span id="bal">0</span></div></div>
+  <div class="body">
+    <div class="pg on" id="p-deals">
+      <div class="scratch" id="adc" style="height:auto;padding:16px"><div><small>Watch an ad, earn rewards</small><div class="rv" id="adrv">+₹0.05</div><button class="btn" id="adbtn" style="padding:8px 22px;width:auto;font-size:16px;margin:6px 0">Watch ad</button><small id="adleft" style="display:block"></small></div></div>
+      <div class="chips" id="chips"></div>
+      <div id="list"></div>
+    </div>
+    <div class="pg" id="p-wallet"><div class="empty"><div class="d" style="font-size:34px;color:var(--ink)">₹<span id="bal2">0</span></div>Total cashback so far. Make your first purchase to get started.</div></div>
+    <div class="pg" id="p-refer"><div class="empty"><div class="d" style="font-size:24px;color:var(--ink)">Invite friends, get ₹25</div>Your referral link will show up here.</div></div>
+    <div class="pg" id="p-me"><div class="empty"><div class="d" style="font-size:24px;color:var(--ink)">Profile</div><div id="who" style="margin-top:6px"></div><button class="out" id="out">Sign out</button></div></div>
+  </div>
+  <div class="nav" id="nav">
+    <button class="on" data-p="deals"><b>🏷️</b>Deals</button>
+    <button data-p="wallet"><b>👛</b>Wallet</button>
+    <button data-p="refer"><b>🎁</b>Refer</button>
+    <button data-p="me"><b>🙂</b>Profile</button>
+  </div>
+  <div class="adov" id="adov"><div><div class="d" style="font-size:22px">Ad playing (demo)</div><div id="adt" class="d" style="font-size:56px">5</div></div></div>
+  <div class="toast" id="toast"></div>
+</section>
+
+</div>
+<script>
+setTimeout(function(){var c=document.getElementById('coin'),l=document.getElementById('lg');if(c)c.style.display='none';if(l){l.style.display='block';l.className='lgin'}},1700);
+</script>
+<script>
+function boot(){
+var firebaseConfig={
+  apiKey:"AIzaSyC3-7L3juowr1J93ATjp3V_N1xpiAbJRpY",
+  authDomain:"deal-karo-43401.firebaseapp.com",
+  projectId:"deal-karo-43401",
+  messagingSenderId:"758648309058",
+  appId:"1:758648309058:web:7495ac162a86ff1ac974db"
+};
+firebase.initializeApp(firebaseConfig);
+var auth=firebase.auth(),db=firebase.firestore();
+var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+function go(id){$$('.scr').forEach(function(s){s.classList.remove('on')});$('#'+id).classList.add('on');}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},2400)}
+function today(){return new Date().toISOString().slice(0,10)}
+function setBal(v){var r=(v/100).toFixed(2);$('#bal').textContent=r;$('#bal2').textContent=r}
+
+/* onboarding */
+var i=0,sl=$$('.sl'),dots=$$('.dots i');
+function show(n){i=n;sl.forEach(function(s,k){s.classList.toggle('on',k===n)});dots.forEach(function(d,k){d.classList.toggle('on',k===n)});$('#next').textContent=n===2?'Get started':'Next'}
+$('#next').onclick=function(){i<2?show(i+1):go('login')};
+
+/* auth */
+var mode='in',curUser,splashDone=false;
+function route(){
+ if(!splashDone||curUser===undefined)return;
+ var onHome=$('#home').classList.contains('on');
+ if(curUser){if(!onHome)enter(curUser)}
+ else if(onHome)go('login');
+ else if($('#splash').classList.contains('on'))go('ob');
+}
+setTimeout(function(){splashDone=true;route()},3300);
+auth.onAuthStateChanged(function(u){curUser=u||null;route()});
+function msg(c){
+ if(/invalid-credential|user-not-found|wrong-password/.test(c))return 'Wrong email or password.';
+ if(c==='auth/email-already-in-use')return 'This email already has an account. Sign in instead.';
+ if(c==='auth/weak-password')return 'Password must be at least 6 characters.';
+ if(c==='auth/invalid-email')return 'Enter a valid email address.';
+ if(c==='auth/network-request-failed')return 'No internet connection.';
+ if(c==='auth/too-many-requests')return 'Too many attempts. Try again later.';
+ return 'Something went wrong. Please try again.';
+}
+var mailOk=function(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)};
+$('#tog').onclick=function(){
+ mode=mode==='in'?'up':'in';$('#e1').textContent='';
+ $('#lt').textContent=mode==='in'?'Sign in':'Create account';
+ $('#ls').textContent=mode==='in'?'Welcome back. Log in to see your wallet.':'Join DealKaro and start earning cashback.';
+ $('#send').textContent=mode==='in'?'Sign in':'Create account';
+ $('#tog').textContent=mode==='in'?'New here? Create an account':'Already have an account? Sign in';
+ $('#forgot').style.display=mode==='in'?'':'none';
+};
+$('#send').onclick=function(){
+ var e=$('#em').value.trim(),p=$('#pw').value,b=$('#send');
+ if(!mailOk(e)){$('#e1').textContent='Enter a valid email address.';return}
+ if(p.length<6){$('#e1').textContent='Password must be at least 6 characters.';return}
+ $('#e1').textContent='';b.disabled=true;
+ var pr=mode==='in'?auth.signInWithEmailAndPassword(e,p):auth.createUserWithEmailAndPassword(e,p);
+ pr.catch(function(x){$('#e1').textContent=msg(x.code)}).then(function(){b.disabled=false});
+};
+$('#forgot').onclick=function(){
+ var e=$('#em').value.trim();
+ if(!mailOk(e)){$('#e1').textContent='Enter your email above first.';return}
+ auth.sendPasswordResetEmail(e).then(function(){toast('Reset link sent to '+e)}).catch(function(x){$('#e1').textContent=msg(x.code)});
+};
+$('#out').onclick=function(){auth.signOut()};
+
+/* wallet + deals */
+var uref=null;
+function enter(u){
+ $('#who').textContent=u.email;go('home');setBal(0);ads=0;adLeft();
+ uref=db.collection('users').doc(u.uid);
+ uref.get().then(function(s){
+  if(s.exists)return s.data();
+  var d={email:u.email,balance:0,adsDate:'',adsCount:0};
+  return uref.set(d).then(function(){return d});
+ }).then(function(d){
+  setBal(d.balance||0);
+  ads=d.adsDate===today()?(d.adsCount||0):0;adLeft();
+ }).catch(function(){toast('Could not load wallet')});
+ loadDeals();
+}
+var deals=[
+ ['Fashion','Style Bazaar','Flat 40% off on clothing','Up to 8%',''],
+ ['Mobiles','Phone Point','Up to \u20b92,000 off on smartphones','Up to 3%',''],
+ ['Grocery','Kirana Kart','\u20b9150 off your first order','Up to 5%',''],
+ ['Fashion','Juta Ghar','Buy 1 get 1 on shoes','Up to 10%',''],
+ ['Travel','Safar Deals','\u20b9100 off on bus tickets','Up to 6%','']];
+var cats=[],cur='All';
+function render(){
+ cats=['All'].concat(deals.map(function(d){return d[0]}).filter(function(x,k,a){return a.indexOf(x)===k}));
+ $('#chips').innerHTML=cats.map(function(c){return '<button class="chip'+(c===cur?' on':'')+'" data-c="'+c+'">'+c+'</button>'}).join('');
+ $('#list').innerHTML=deals.filter(function(d){return cur==='All'||d[0]===cur}).map(function(d,k){return '<div class="tk"><div class="l"><b></b><span></span></div><div class="r"><em></em><span style="font-size:12px;color:var(--mute)">cashback</span><button data-k="'+deals.indexOf(d)+'">Get deal</button></div></div>'}).join('');
+ var rows=$$('#list .tk'),vis=deals.filter(function(d){return cur==='All'||d[0]===cur});
+ rows.forEach(function(r,k){r.querySelector('b').textContent=vis[k][1];r.querySelector('.l span').textContent=vis[k][2];r.querySelector('em').textContent=vis[k][3]});
+}
+function loadDeals(){
+ db.collection('deals').orderBy('order').get().then(function(q){
+  if(q.empty)return;
+  deals=q.docs.map(function(x){var d=x.data();return [d.category||'Other',d.store||'',d.title||'',d.cashback||'',d.link||'']});
+  cur='All';render();
+ }).catch(function(){});
+}
+$('#chips').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render()}};
+$('#list').onclick=function(e){
+ var k=e.target.getAttribute('data-k');if(k===null)return;
+ var d=deals[k];
+ if(d[4]&&curUser){window.open(d[4].replace('{uid}',curUser.uid),'_blank')}
+ else toast(d[1]+' link coming soon');
+};
+render();
+$('#nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;$$('.nav button').forEach(function(x){x.classList.toggle('on',x===b)});$$('.pg').forEach(function(p){p.classList.toggle('on',p.id==='p-'+b.getAttribute('data-p'))})};
+
+/* rewarded ads (demo player; replace with AdMob in the APK) */
+var AD_PAISE=5,AD_MAX=10,ads=0;
+function coinFx(){var c=document.createElement('div');c.className='fc';c.textContent='\u20b9';$('#home').appendChild(c);setTimeout(function(){c.remove()},1000)}
+function adLeft(){$('#adleft').textContent=(AD_MAX-ads)+' of '+AD_MAX+' ads left today';$('#adbtn').disabled=ads>=AD_MAX}
+function showAd(done){
+ var o=$('#adov'),t=5;o.classList.add('on');$('#adt').textContent=t;
+ var iv=setInterval(function(){t--;$('#adt').textContent=t;if(t<=0){clearInterval(iv);o.classList.remove('on');done()}},1000);
+}
+$('#adbtn').onclick=function(){
+ if(!uref||ads>=AD_MAX)return;
+ showAd(function(){
+  uref.update({balance:firebase.firestore.FieldValue.increment(AD_PAISE),adsDate:today(),adsCount:ads+1})
+   .then(function(){ads++;return uref.get()})
+   .then(function(x){setBal(x.data().balance);adLeft();coinFx();toast('+\u20b90.05 added to your wallet')})
+   .catch(function(){toast('Could not save. Check your connection.')});
+ });
+};
+
+window.go=go;
+}
+
+var B=[function(n){return 'https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-'+n+'-compat.min.js'},function(n){return 'https://www.gstatic.com/firebasejs/10.12.2/firebase-'+n+'-compat.js'}],L=['app','auth','firestore'];
+function ld(src,ok,bad){var t=document.createElement('script');t.src=src;t.onload=ok;t.onerror=bad;document.head.appendChild(t)}
+function tryBase(b){var k=0;(function next(){if(k>=L.length){boot();return}ld(B[b](L[k]),function(){k++;next()},function(){if(b+1<B.length)tryBase(b+1);else document.querySelector('#splash p').textContent='Could not load. Check your internet and reopen.'})})()}
+tryBase(0);
+</script>
+</body>
+</html>
