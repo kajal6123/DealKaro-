@@ -1,27 +1,28 @@
-import os, shutil
+import os, io, shutil, base64
 from PIL import Image, ImageDraw
+
 RES = os.environ.get("RES", "android/app/src/main/res")
-N = 1024
-im = Image.new("RGB", (N, N), (14, 16, 51))
-d = ImageDraw.Draw(im)
-d.arc([370, 190, 654, 520], 180, 360, fill=(255, 226, 122), width=40)
-d.rounded_rectangle([250, 380, 774, 860], 70, fill=(255, 196, 0))
-d.rounded_rectangle([250, 380, 390, 860], 70, fill=(255, 150, 0))
-d.arc([410, 560, 614, 720], 20, 160, fill=(14, 16, 51), width=24)
-tag = Image.new("RGBA", (260, 320), (0, 0, 0, 0))
-t = ImageDraw.Draw(tag)
-t.rounded_rectangle([0, 0, 259, 319], 40, fill=(255, 45, 135, 255))
-t.ellipse([50, 70, 110, 130], outline="white", width=14)
-t.ellipse([150, 190, 210, 250], outline="white", width=14)
-t.line([185, 80, 75, 240], fill="white", width=16)
-tag = tag.rotate(-18, expand=True, resample=Image.BICUBIC)
-im.paste(tag, (600, 300), tag)
+
+if os.path.exists("icon.b64"):
+    data = base64.b64decode(open("icon.b64").read())
+    im = Image.open(io.BytesIO(data)).convert("RGB")
+else:
+    N = 1024
+    im = Image.new("RGB", (N, N), (14, 16, 51))
+    d = ImageDraw.Draw(im)
+    d.arc([370, 190, 654, 520], 180, 360, fill=(255, 226, 122), width=40)
+    d.rounded_rectangle([250, 380, 774, 860], 70, fill=(255, 196, 0))
+
 shutil.rmtree(os.path.join(RES, "mipmap-anydpi-v26"), ignore_errors=True)
 for name, size in [("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)]:
     folder = os.path.join(RES, "mipmap-" + name)
     os.makedirs(folder, exist_ok=True)
     small = im.resize((size, size), Image.LANCZOS)
     small.save(os.path.join(folder, "ic_launcher.png"))
-    small.save(os.path.join(folder, "ic_launcher_round.png"))
-im.save("/tmp/icon_preview.png")
+    mask = Image.new("L", (size * 4, size * 4), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, size * 4 - 1, size * 4 - 1], fill=255)
+    mask = mask.resize((size, size), Image.LANCZOS)
+    rnd = small.convert("RGBA")
+    rnd.putalpha(mask)
+    rnd.save(os.path.join(folder, "ic_launcher_round.png"))
 print("icons written to", RES)
