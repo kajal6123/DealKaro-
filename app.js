@@ -25,7 +25,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp
 function go(id){$$('.scr').forEach(function(s){s.classList.remove('on')});$('#'+id).classList.add('on')}
 function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},2400)}
 function today(){return new Date().toISOString().slice(0,10)}
-var bal=0;function setBal(v){bal=v;var r=(v/100).toFixed(2);$('#bal').textContent=r;$('#bal2').textContent=r}
+var bal=0;function setBal(v){bal=v;var r=(v/100).toFixed(2);$('#bal').textContent=r;$('#bal2').textContent=r;var t=$('#tot');if(t)t.textContent='₹'+r}
 /* auth */
 var curUser,splashDone=false,uref=null,ads=0;
 function route(){if(!splashDone||curUser===undefined)return;var h=$('#home').classList.contains('on');
@@ -48,7 +48,7 @@ $('#out').onclick=function(){auth.signOut()};
 var deals=[["Electronics","Flipkart","Mobiles, TVs, laptops and more","Up to 5%","https://www.flipkart.com"],["Electronics","Amazon","Electronics, home and daily needs","Up to 4%","https://www.amazon.in"],["Women's Fashion","Myntra","Fashion for women and men","Up to 5%","https://www.myntra.com"],["Men's Fashion","AJIO","Fashion, footwear and accessories","Up to 6%","https://www.ajio.com"]];
 var cats=["Electronics","Men's Fashion","Women's Fashion"],cur='All',q='',sort='pop',stats={clicks:0,orders:0,daily:[0,0,0,0,0,0,0]};
 function pct(d){return parseFloat(d[3].replace(/[^0-9.]/g,''))||0}
-function render(){
+function render(){lkChips();
  var cs=['All'].concat(deals.map(function(d){return d[0]}).filter(function(x,k,a){return a.indexOf(x)===k}));
  $('#chips').innerHTML=cs.map(function(c){return '<button class="chip'+(c===cur?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join('');
  var v=deals.map(function(d,k){return [d,k]}).filter(function(x){var d=x[0];return(cur==='All'||d[0]===cur)&&(d[1]+' '+d[2]).toLowerCase().indexOf(q)>-1});
@@ -60,6 +60,7 @@ function render(){
  $('#st').innerHTML=[['Clicks',stats.clicks||0],['Orders',stats.orders||0],['Earnings','₹'+(bal/100).toFixed(2)],['Conv. rate',stats.clicks?Math.round((stats.orders||0)/stats.clicks*100)+'%':'0%']].map(function(s){return '<div><small>'+s[0]+'</small><b>'+esc(s[1])+'</b></div>'}).join('');
  var dl=stats.daily||[0,0,0,0,0,0,0],mx=Math.max.apply(null,dl.concat([1]));
  $('#chart').innerHTML='<svg viewBox="0 0 280 110" width="100%">'+dl.map(function(n,k){var h=Math.max(3,n/mx*80);return '<rect x="'+(k*40+8)+'" y="'+(90-h)+'" width="24" height="'+h+'" rx="5" fill="#FF2D87"/>'}).join('')+'<line x1="0" y1="92" x2="280" y2="92" stroke="#F1DFA0"/></svg>'}
+function lkChips(){var e=$('#lkp');if(e)e.innerHTML=seenStores().map(function(x){return '<button class="chip" data-k="'+x[1]+'">'+esc(x[0][1])+'</button>'}).join('')}
 function open1(k){var d=deals[k];if(d[4]&&curUser)window.open(d[4].replace('{uid}',curUser.uid),'_blank');else toast(d[1]+' link coming soon')}
 $('#list').onclick=$('#plist').onclick=function(e){var b=e.target.closest('[data-k]');if(b)open1(b.getAttribute('data-k'))};
 $('#chips').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render()}};
@@ -71,23 +72,45 @@ function renderSearch(){var v=sq.value.trim().toLowerCase();
  if(!v){sres.innerHTML='<div class="tl">Trending searches</div><div class="tr">'+TR.map(function(t){return '<button class="chip" data-t="'+esc(t)+'">'+esc(t)+'</button>'}).join('')+'</div><div class="tl" style="margin-top:22px">In Stores</div><div class="scrow">'+seenStores().map(function(x){var d=x[0];return '<button class="sc" data-k="'+x[1]+'"><div class="lo">'+esc(d[1].charAt(0))+'</div><b>'+esc(d[1])+'</b><em>'+esc(d[3])+'</em></button>'}).join('')+'</div>';return}
  var m=deals.map(function(d,k){return [d,k]}).filter(function(x){var d=x[0];return (d[0]+' '+d[1]+' '+d[2]).toLowerCase().indexOf(v)>-1});
  sres.innerHTML=m.length?m.map(function(x){var d=x[0];return '<button class="row" data-k="'+x[1]+'"><div class="lo">'+esc(d[1].charAt(0))+'</div><div><b>'+esc(d[1])+'</b><span>'+esc(d[2])+'</span></div><i>›</i></button>'}).join(''):'<p class="mt">No stores found for "'+esc(sq.value)+'"</p>'}
-function openSearch(){$('#sov').classList.add('on');sq.value='';renderSearch();setTimeout(function(){sq.focus()},60)}
-function closeSearch(){$('#sov').classList.remove('on');sq.blur()}
+function openSearch(){if(!$('#sov').classList.contains('on'))pushH();$('#sov').classList.add('on');sq.value='';renderSearch();setTimeout(function(){sq.focus()},60)}
+function closeSearch(fromPop){if(!$('#sov').classList.contains('on'))return;$('#sov').classList.remove('on');sq.blur();if(fromPop!==true)popH()}
 $('#q').onclick=openSearch;
-$('#sback').onclick=closeSearch;
+$('#sback').onclick=function(){closeSearch()};
 sq.oninput=renderSearch;
 sres.onclick=function(e){var t=e.target.closest('[data-t]');if(t){sq.value=t.getAttribute('data-t');renderSearch();return}var k=e.target.closest('[data-k]');if(k)open1(k.getAttribute('data-k'))};
+$('#lkp').onclick=function(e){var b=e.target.closest('[data-k]');if(b)open1(b.getAttribute('data-k'))};
 $('#mk').onclick=function(){var v=$('#lk').value.trim();if(!/^https?:\/\/.+\..+/.test(v)){toast('Paste a valid link starting with https://');return}toast('Link maker turns on after affiliate approval')};
-function page(p){$$('.pg').forEach(function(x){x.classList.toggle('on',x.id==='p-'+p)});$$('.nav button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-p')===p)});$('.body').scrollTop=0}
+var curP='home',hs=0,skip=0,TT={partners:'Partners',links:'Make Links',reports:'Reports',me:'Profile'};
+function pushH(){try{history.pushState({dk:1},'');hs++}catch(e){}}
+function popH(){if(hs>0){skip++;history.back()}}
+function page(p,fromPop){
+ if(p!=='home'&&curP==='home'&&!fromPop)pushH();
+ var wasHome=curP==='home';curP=p;
+ $$('.pg').forEach(function(x){x.classList.toggle('on',x.id==='p-'+p)});
+ $$('.nav button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-p')===p)});
+ var home=p==='home';$('#mn').style.display=home?'':'none';$('#bk').style.display=home?'none':'';
+ if(home)$('#ttl').innerHTML='Deal<span>Karo</span>';else $('#ttl').textContent=TT[p]||'';
+ $('.body').scrollTop=0;
+ if(home&&!wasHome&&!fromPop)popH();
+}
+$('#bk').onclick=function(){page('home')};
+window.addEventListener('popstate',function(){
+ if(skip>0){skip--;hs=Math.max(0,hs-1);return}
+ hs=Math.max(0,hs-1);
+ if($('#sov').classList.contains('on')){closeSearch(true);return}
+ if($('#sh').classList.contains('on')){closeSheet(true);return}
+ if($('#dr').classList.contains('on')){drawer(false,true);return}
+ if(curP!=='home')page('home',true);
+});
 $('#nav').onclick=function(e){var b=e.target.closest('button');if(b)page(b.getAttribute('data-p'))};
 /* drawer + sheet */
-function drawer(on){$('#dr').classList.toggle('on',on);$('#ov').classList.toggle('on',on)}
+function drawer(on,fromPop){var was=$('#dr').classList.contains('on');if(on&&!was)pushH();$('#dr').classList.toggle('on',on);$('#ov').classList.toggle('on',on);if(!on&&was&&fromPop!==true)popH()}
 $('#dr').innerHTML='<h3>Categories</h3><button data-c="All">All deals</button>'+cats.map(function(c){return '<button data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join('');
 $('#mn').onclick=function(){drawer(true)};
-$('#dr').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render();page('home');drawer(false)}};
-function sheet(h){$('#sh').innerHTML=h;$('#sh').classList.add('on');$('#ov').classList.add('on')}
-$('#ov').onclick=function(){drawer(false);$('#sh').classList.remove('on')};
-function closeSheet(){$('#sh').classList.remove('on');$('#ov').classList.remove('on')}
+$('#dr').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render();drawer(false);page('home')}};
+function sheet(h){if(!$('#sh').classList.contains('on'))pushH();$('#sh').innerHTML=h;$('#sh').classList.add('on');$('#ov').classList.add('on')}
+$('#ov').onclick=function(){if($('#dr').classList.contains('on'))drawer(false);else closeSheet()};
+function closeSheet(fromPop){if(!$('#sh').classList.contains('on'))return;$('#sh').classList.remove('on');$('#ov').classList.remove('on');if(fromPop!==true)popH()}
 $('#rp').onclick=function(){
  var MIN_U=10,MIN_B=100;
  sheet('<h3>Request Payment</h3><p>Balance: ₹'+(bal/100).toFixed(2)+'. Minimum ₹10.</p>'
@@ -128,7 +151,7 @@ $('#rp').onclick=function(){
   }).catch(function(){toast('Could not send. Try again.')});
  };
 };
- $('#ph').onclick=function(){sheet('<h3>Payment History</h3><p class="mt">Loading…</p>');
+$('#ph').onclick=function(){sheet('<h3>Payment History</h3><p class="mt">Loading…</p>');
  db.collection('withdrawals').where('uid','==',curUser.uid).get().then(function(q){var r=q.docs.map(function(d){return d.data()}).sort(function(a,b){return (b.createdAt?b.createdAt.seconds:0)-(a.createdAt?a.createdAt.seconds:0)});
   $('#sh').innerHTML='<h3>Payment History</h3>'+(r.length?r.map(function(x){return '<div class="row"><div><b>₹'+(x.amount/100).toFixed(2)+'</b><small>'+esc(x.upi)+'</small></div><span>'+esc(x.status)+'</span></div>'}).join(''):'<p class="mt">No requests yet.</p>')}).catch(function(){$('#sh').innerHTML='<h3>Payment History</h3><p class="mt">Could not load.</p>'})};
 var SUPPORT_EMAIL="travikaagems@gmail.com",me={};
@@ -147,12 +170,12 @@ function enter(u){go('home');page('home');setBal(0);startAds();
  $('#nm').textContent=(u.email||'').split('@')[0];$('#av').textContent=(u.email||'D').charAt(0).toUpperCase();$('#uid').textContent=u.uid.slice(0,7).toUpperCase();
  uref=db.collection('users').doc(u.uid);
  uref.get().then(function(s){if(s.exists)return s.data();var d={email:u.email,balance:0,name:window.__nm||''};return uref.set(d).then(function(){return d})}).then(function(d){
-  me=d;if(d.name)$('#nm').textContent=d.name;$('#pend').textContent=((d.pending||0)/100).toFixed(2);setBal(d.balance||0);if(d.stats)stats=d.stats;render()}).catch(function(){toast('Could not load wallet')});
+  me=d;if(d.name)$('#nm').textContent=d.name;$('#pend').textContent=((d.pending||0)/100).toFixed(2);$('#pend2').textContent=((d.pending||0)/100).toFixed(2);setBal(d.balance||0);if(d.stats)stats=d.stats;render()}).catch(function(){toast('Could not load wallet')});
  db.collection('deals').orderBy('order').get().then(function(q){if(q.empty)return;deals=q.docs.map(function(x){var d=x.data();return [d.category||'Other',d.store||'',d.title||'',d.cashback||'',d.link||'']});cur='All';render()}).catch(function(){})}
 /* banner ad (installed app only; test ids for now) */
 var ADMOB_BANNER="ca-app-pub-3775789465941687/1478778717",adOn=false;
 function startAds(){var C=window.Capacitor;if(adOn||!C||!C.isNativePlatform||!C.isNativePlatform())return;var A=C.Plugins&&C.Plugins.AdMob;if(!A)return;adOn=true;$('#app').classList.add('nat');
- A.initialize({initializeForTesting:true}).then(function(){return A.showBanner({adId:ADMOB_BANNER,adSize:'BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:true})}).catch(function(){adOn=false})}
+ A.initialize({initializeForTesting:true}).then(function(){return A.showBanner({adId:ADMOB_BANNER,adSize:'BANNER',position:'BOTTOM_CENTER',margin:60,isTesting:true})}).catch(function(){adOn=false})}
 render();
 setInterval(function(){var b=$('#bn');if(b&&$('#p-home').classList.contains('on')){var w=b.clientWidth+10;b.scrollTo({left:b.scrollLeft+w>=b.scrollWidth-5?0:b.scrollLeft+w,behavior:'smooth'})}},3500);
 }
@@ -165,4 +188,3 @@ function sp(t){var p=document.querySelector('#splash p');if(p&&!window.__booted)
 window.addEventListener('error',function(e){sp('Error: '+(e.message||'script failed'))});
 setTimeout(function(){sp('Still loading… check your internet')},9000);
 tryBase(0);
- 
