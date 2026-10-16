@@ -33,6 +33,16 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 .sp3{opacity:0;animation:fadein .6s 1.6s forwards;color:var(--or);font-weight:700;font-size:15px;letter-spacing:.3px}
 .tabs{display:flex;background:rgba(255,255,255,.14);border-radius:14px;padding:4px}.tabs button{flex:1;padding:11px;border-radius:10px;color:#fff;font-weight:700}.tabs .on{background:var(--or);color:var(--cb)}
 .lgo{width:120px;height:120px;border-radius:50%;align-self:center}
+.sov{position:absolute;inset:0;background:var(--paper);z-index:8;display:none;flex-direction:column}.sov.on{display:flex}
+.sbar{display:flex;align-items:center;gap:10px;padding:14px;background:var(--card);box-shadow:0 2px 0 var(--line)}
+.sbar button{width:40px;height:40px;border-radius:12px;background:var(--paper);color:var(--ink);font-size:20px;flex:none}
+.sbar input{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font:500 16px 'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-width:0}
+.sbody{flex:1;overflow-y:auto;padding:16px}
+.tl{font:800 16px 'Bricolage Grotesque',sans-serif;color:var(--ink);margin:0 0 10px}
+.tr{display:flex;flex-wrap:wrap;gap:8px}
+.scrow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.sc{flex:0 0 150px;background:var(--card);border-radius:16px;box-shadow:0 4px 0 var(--line);padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left}
+.sc b{font:800 16px 'Bricolage Grotesque',sans-serif}.sc em{font-style:normal;color:var(--pk);font-weight:700;font-size:13px}
 .btn{background:var(--or);color:var(--cb);font:800 18px 'Bricolage Grotesque';padding:14px;border-radius:14px;width:100%;box-shadow:0 5px 0 #C99700}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #C99700}.btn:disabled{opacity:.5}
 .login{background:var(--cb);color:#fff;padding:28px;justify-content:center;gap:14px}.login h2{font-size:32px}
 .in{background:#fff;border:0;border-radius:14px;padding:14px;font:500 17px 'DM Sans';color:#0E1033;width:100%}
@@ -75,7 +85,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 .fc{position:absolute;left:50%;top:60%;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:var(--or);color:var(--cb);display:grid;place-items:center;font:800 18px 'Bricolage Grotesque';z-index:9;animation:fly .9s ease-in forwards;pointer-events:none}
 @keyframes fly{0%{transform:scale(.4);opacity:0}20%{opacity:1;transform:scale(1)}100%{transform:translate(110px,-460px) scale(.5);opacity:0}}
 .toast{position:absolute;left:16px;right:16px;bottom:96px;background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:10}.toast.on{opacity:1;transform:none}
-.nat .body{padding-bottom:170px}
+.nat .body{padding-bottom:120px}
+.nat .nav{bottom:50px}
 .mt{color:var(--mute);text-align:center;padding:20px}
 @media (prefers-reduced-motion:reduce){.coin{animation:none}}
 </style></head><body>
@@ -114,7 +125,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
  <div class="hd"><button id="mn" aria-label="Menu">☰</button><h3>Deal<span>Karo</span></h3><div class="wal">₹<span id="bal">0.00</span></div></div>
  <div class="body">
   <div class="pg on" id="p-home">
-   <input class="in sr" id="q" placeholder="Search for stores" aria-label="Search">
+   <button class="in sr" id="q" style="display:block;width:100%;text-align:left;color:var(--mute);font:500 16px 'DM Sans',sans-serif">Search for stores</button>
    <div class="bn" id="bn">
     <div class="bs" style="background:linear-gradient(135deg,#FF2D87,#7A1FFF)"><b>Shop through DealKaro</b><span>Earn on every purchase</span></div>
     <div class="bs" style="background:linear-gradient(135deg,#0E1033,#2B3BA8)"><b>Withdraw from just ₹10</b><span>Track every click and order</span></div>
@@ -134,7 +145,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
    <button class="row" id="me2"><div><b>My Earnings</b></div><i>›</i></button>
    <button class="row" id="rp"><div><b>Request Payment</b></div><i>›</i></button>
    <button class="row" id="ph"><div><b>Payment History</b></div><i>›</i></button>
-   <button class="row" id="rf"><div><b>Refer &amp; Earn</b></div><i>›</i></button>
    <button class="row" id="pv"><div><b>Privacy Policy</b></div><i>›</i></button>
    <button class="row" id="tc"><div><b>Terms &amp; Conditions</b></div><i>›</i></button>
    <button class="row" id="ct"><div><b>Contact Us</b></div><i>›</i></button>
@@ -147,6 +157,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
  </div>
  <div class="ov" id="ov"></div><div class="dr" id="dr"></div><div class="sh" id="sh"></div>
 <div class="toast" id="toast"></div>
+ <div class="sov" id="sov"><div class="sbar"><button id="sback" aria-label="Back">←</button><input id="sq" type="search" placeholder="Search for partners or deals" aria-label="Search"></div><div class="sbody" id="sres"></div></div>
 </section>
 </div>
 
@@ -154,3 +165,4 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 <script>var __d=document.getElementById('dbg');if(__d)__d.textContent='html-ok ';window.onerror=function(m,u,l){var e=document.getElementById('dbg');if(e){e.textContent+=' ERR:'+m+'@'+l;e.style.display='block'}};setTimeout(function(){var sp=document.getElementById('splash');if(sp&&sp.classList.contains('on')&&__d)__d.style.display='block'},8000);</script>
 <script src="app.js" onerror="document.getElementById('dbg').textContent+=' app.js-missing'"></script>
 </body></html>
+     
