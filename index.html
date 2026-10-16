@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 @media (prefers-reduced-motion:reduce){.coin{animation:none}}
 </style></head><body>
 <div id="app">
-<section class="scr on" id="splash"><div class="coin" id="coin">₹</div><h1 class="sp">Deal<span>Karo</span></h1><p class="sp2">Shop. Earn. Repeat.</p><p class="sp3">Affiliate Marketing • Cashback • Rewards</p></section>
+<section class="scr on" id="splash"><div class="coin" id="coin">₹</div><h1 class="sp">Deal<span>Karo</span></h1><p class="sp2">Shop. Earn. Repeat.</p><p class="sp3">Affiliate Marketing • Cashback • Rewards</p><div id="dbg" style="display:none;position:absolute;bottom:18px;left:0;right:0;text-align:center;font:11px monospace;color:#fff;opacity:.45"></div></section>
 
 <section class="scr ob" id="ob">
   <button class="skip" id="skip">Skip</button>
@@ -95,6 +95,21 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
   <div class="dots"><i class="on"></i><i></i><i></i></div>
   <button class="btn" id="next">Next</button>
 </section>
+
+<section class="scr login" id="login">
+ <img class="lgo" src="logo.webp" alt="DealKaro" onerror="this.style.display='none'">
+ <div class="tabs"><button id="t-in" class="on">Sign in</button><button id="t-up">Sign up</button></div>
+ <h2 id="lt">Sign in</h2><p id="ls">Welcome back. Log in to see your wallet.</p>
+ <input class="in" id="sn" placeholder="Your name" aria-label="Name" style="display:none">
+ <input class="in" id="em" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Email">
+ <input class="in" id="pw" type="password" autocomplete="current-password" placeholder="Password (min 6 characters)" aria-label="Password">
+ <div class="err" id="e1"></div>
+ <button class="btn" id="send">Sign in</button>
+ <button class="lnk" id="tog">New here? Create an account</button>
+ <button class="lnk" id="forgot">Forgot password?</button>
+ <p class="fine">By continuing you agree to our Terms and Privacy Policy.</p>
+</section>
+
 <section class="scr" id="home">
  <div class="hd"><button id="mn" aria-label="Menu">☰</button><h3>Deal<span>Karo</span></h3><div class="wal">₹<span id="bal">0.00</span></div></div>
  <div class="body">
@@ -134,3 +149,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 <div class="toast" id="toast"></div>
 </section>
 </div>
+
+
+<script>var __d=document.getElementById('dbg');if(__d)__d.textContent='html-ok ';window.onerror=function(m,u,l){var e=document.getElementById('dbg');if(e){e.textContent+=' ERR:'+m+'@'+l;e.style.display='block'}};setTimeout(function(){var sp=document.getElementById('splash');if(sp&&sp.classList.contains('on')&&__d)__d.style.display='block'},8000);</script>
+<script src="app.js" onerror="document.getElementById('dbg').textContent+=' app.js-missing'"></script>
+</body></html>
