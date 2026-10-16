@@ -15,6 +15,7 @@ jobs:
           java-version: 21
       - run: mkdir -p www && cp index.html www/index.html
       - run: npm install
+      - run: cp node_modules/firebase/firebase-app-compat.js node_modules/firebase/firebase-auth-compat.js node_modules/firebase/firebase-firestore-compat.js www/ || true
       - run: npx cap add android
       - run: pip install pillow && python3 make_icon.py
       - run: |
