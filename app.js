@@ -45,8 +45,8 @@ $('#forgot').onclick=function(){var e=$('#em').value.trim();if(!mailOk(e)){$('#e
  auth.sendPasswordResetEmail(e).then(function(){toast('Reset link sent to '+e)}).catch(function(x){$('#e1').textContent=msg(x.code)})};
 $('#out').onclick=function(){auth.signOut()};
 /* data */
-var deals=[["Women's Fashion","Style Bazaar","Flat 40% off on clothing","Up to 8%",""],["Electronics","Phone Point","Up to ₹2,000 off on phones","Up to 3%",""],["Grocery","Kirana Kart","₹150 off your first order","Up to 5%",""],["Footwear","Juta Ghar","Buy 1 get 1 on shoes","Up to 10%",""],["Beauty","Glow House","Skincare combos","Up to 12%",""]];
-var cats=["Electronics","Grocery","Men's Fashion","Women's Fashion","Footwear","Beauty","Health","Baby","Home & Kitchen"],cur='All',q='',sort='pop',stats={clicks:0,orders:0,daily:[0,0,0,0,0,0,0]};
+var deals=[["Electronics","Flipkart","Mobiles, TVs, laptops and more","Up to 5%","https://www.flipkart.com"],["Electronics","Amazon","Electronics, home and daily needs","Up to 4%","https://www.amazon.in"],["Women's Fashion","Myntra","Fashion for women and men","Up to 5%","https://www.myntra.com"],["Men's Fashion","AJIO","Fashion, footwear and accessories","Up to 6%","https://www.ajio.com"]];
+var cats=["Electronics","Men's Fashion","Women's Fashion"],cur='All',q='',sort='pop',stats={clicks:0,orders:0,daily:[0,0,0,0,0,0,0]};
 function pct(d){return parseFloat(d[3].replace(/[^0-9.]/g,''))||0}
 function render(){
  var cs=['All'].concat(deals.map(function(d){return d[0]}).filter(function(x,k,a){return a.indexOf(x)===k}));
@@ -64,7 +64,19 @@ function open1(k){var d=deals[k];if(d[4]&&curUser)window.open(d[4].replace('{uid
 $('#list').onclick=$('#plist').onclick=function(e){var b=e.target.closest('[data-k]');if(b)open1(b.getAttribute('data-k'))};
 $('#chips').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render()}};
 $('#sorts').onclick=function(e){var s=e.target.getAttribute('data-s');if(s){sort=s;render()}};
-$('#q').oninput=function(){q=this.value.trim().toLowerCase();render()};
+/* search page */
+var sq=$('#sq'),sres=$('#sres'),TR=['Flipkart','Myntra','AJIO','Amazon','Electronics','Fashion'];
+function seenStores(){var s={},o=[];deals.forEach(function(d,k){if(!s[d[1]]){s[d[1]]=1;o.push([d,k])}});return o}
+function renderSearch(){var v=sq.value.trim().toLowerCase();
+ if(!v){sres.innerHTML='<div class="tl">Trending searches</div><div class="tr">'+TR.map(function(t){return '<button class="chip" data-t="'+esc(t)+'">'+esc(t)+'</button>'}).join('')+'</div><div class="tl" style="margin-top:22px">In Stores</div><div class="scrow">'+seenStores().map(function(x){var d=x[0];return '<button class="sc" data-k="'+x[1]+'"><div class="lo">'+esc(d[1].charAt(0))+'</div><b>'+esc(d[1])+'</b><em>'+esc(d[3])+'</em></button>'}).join('')+'</div>';return}
+ var m=deals.map(function(d,k){return [d,k]}).filter(function(x){var d=x[0];return (d[0]+' '+d[1]+' '+d[2]).toLowerCase().indexOf(v)>-1});
+ sres.innerHTML=m.length?m.map(function(x){var d=x[0];return '<button class="row" data-k="'+x[1]+'"><div class="lo">'+esc(d[1].charAt(0))+'</div><div><b>'+esc(d[1])+'</b><span>'+esc(d[2])+'</span></div><i>›</i></button>'}).join(''):'<p class="mt">No stores found for "'+esc(sq.value)+'"</p>'}
+function openSearch(){$('#sov').classList.add('on');sq.value='';renderSearch();setTimeout(function(){sq.focus()},60)}
+function closeSearch(){$('#sov').classList.remove('on');sq.blur()}
+$('#q').onclick=openSearch;
+$('#sback').onclick=closeSearch;
+sq.oninput=renderSearch;
+sres.onclick=function(e){var t=e.target.closest('[data-t]');if(t){sq.value=t.getAttribute('data-t');renderSearch();return}var k=e.target.closest('[data-k]');if(k)open1(k.getAttribute('data-k'))};
 $('#mk').onclick=function(){var v=$('#lk').value.trim();if(!/^https?:\/\/.+\..+/.test(v)){toast('Paste a valid link starting with https://');return}toast('Link maker turns on after affiliate approval')};
 function page(p){$$('.pg').forEach(function(x){x.classList.toggle('on',x.id==='p-'+p)});$$('.nav button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-p')===p)});$('.body').scrollTop=0}
 $('#nav').onclick=function(e){var b=e.target.closest('button');if(b)page(b.getAttribute('data-p'))};
@@ -76,19 +88,51 @@ $('#dr').onclick=function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;r
 function sheet(h){$('#sh').innerHTML=h;$('#sh').classList.add('on');$('#ov').classList.add('on')}
 $('#ov').onclick=function(){drawer(false);$('#sh').classList.remove('on')};
 function closeSheet(){$('#sh').classList.remove('on');$('#ov').classList.remove('on')}
-$('#rp').onclick=function(){sheet('<h3>Request Payment</h3><p>Balance: ₹'+(bal/100).toFixed(2)+'. Minimum withdrawal ₹10.</p><input class="in" id="upi" value="'+esc(me.upi||'')+'" placeholder="Your UPI ID" aria-label="UPI ID"><input class="in" id="amt" type="number" inputmode="decimal" placeholder="Amount (₹)" aria-label="Amount"><button class="btn" id="go">Send request</button>');
- $('#go').onclick=function(){var u=$('#upi').value.trim(),a=parseFloat($('#amt').value);
-  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(u)){toast('Enter a valid UPI ID');return}if(!(a>=10)){toast('Minimum withdrawal is ₹10');return}if(a*100>bal){toast('Amount is more than your balance');return}
-  db.collection('withdrawals').add({uid:curUser.uid,upi:u,amount:Math.round(a*100),status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){closeSheet();toast('Request sent. We will verify and pay you.')}).catch(function(){toast('Could not send. Try again.')})}};
-$('#ph').onclick=function(){sheet('<h3>Payment History</h3><p class="mt">Loading…</p>');
+$('#rp').onclick=function(){
+ var MIN_U=10,MIN_B=100;
+ sheet('<h3>Request Payment</h3><p>Balance: ₹'+(bal/100).toFixed(2)+'. Minimum ₹10.</p>'
+  +'<input class="in" id="amt" type="number" inputmode="decimal" placeholder="Amount (₹)" aria-label="Amount">'
+  +'<p id="how" style="color:var(--mute);font-size:14px;margin:0"></p>'
+  +'<div id="upiW"><input class="in" id="upi" placeholder="Your UPI ID" aria-label="UPI ID" value="'+esc(me.upi||'')+'"></div>'
+  +'<div id="bankW" style="display:none;flex-direction:column;gap:10px">'
+  +'<input class="in" id="bn" placeholder="Account holder name" aria-label="Account holder name" value="'+esc((me.bank&&me.bank.name)||'')+'">'
+  +'<input class="in" id="ba" inputmode="numeric" placeholder="Account number" aria-label="Account number" value="'+esc((me.bank&&me.bank.acc)||'')+'">'
+  +'<input class="in" id="bi" placeholder="IFSC code" aria-label="IFSC code" value="'+esc((me.bank&&me.bank.ifsc)||'')+'">'
+  +'</div><button class="btn" id="go">Send request</button>');
+ function mode(){
+  var a=parseFloat($('#amt').value)||0,bank=a>=MIN_B;
+  $('#upiW').style.display=bank?'none':'block';
+  $('#bankW').style.display=bank?'flex':'none';
+  $('#how').textContent=a?(bank?'₹100 or more goes to your bank account in 48 to 72 hours.':'Below ₹100 goes to your UPI ID.'):'';
+ }
+ $('#amt').oninput=mode;
+ $('#go').onclick=function(){
+  var a=parseFloat($('#amt').value);
+  if(!(a>=MIN_U)){toast('Minimum withdrawal is ₹10');return}
+  if(a*100>bal){toast('Amount is more than your balance');return}
+  var data={uid:curUser.uid,amount:Math.round(a*100),status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()},bankSave=null;
+  if(a>=MIN_B){
+   var bn=$('#bn').value.trim(),ba=$('#ba').value.trim(),bi=$('#bi').value.trim().toUpperCase();
+   if(bn.length<3){toast('Enter the account holder name');return}
+   if(!/^\d{9,18}$/.test(ba)){toast('Enter a valid account number');return}
+   if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(bi)){toast('Enter a valid IFSC code');return}
+   data.method='bank';data.bank={name:bn,acc:ba,ifsc:bi};bankSave={name:bn,acc:ba,ifsc:bi};
+  }else{
+   var u=$('#upi').value.trim();
+   if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(u)){toast('Enter a valid UPI ID');return}
+   data.method='upi';data.upi=u;
+  }
+  db.collection('withdrawals').add(data).then(function(){
+   if(bankSave){me.bank=bankSave;uref.update({bank:bankSave}).catch(function(){})}
+   closeSheet();toast(data.method==='bank'?'Request sent. Bank payout in 48 to 72 hours.':'Request sent. UPI payout soon.');
+  }).catch(function(){toast('Could not send. Try again.')});
+ };
+};
+ $('#ph').onclick=function(){sheet('<h3>Payment History</h3><p class="mt">Loading…</p>');
  db.collection('withdrawals').where('uid','==',curUser.uid).get().then(function(q){var r=q.docs.map(function(d){return d.data()}).sort(function(a,b){return (b.createdAt?b.createdAt.seconds:0)-(a.createdAt?a.createdAt.seconds:0)});
   $('#sh').innerHTML='<h3>Payment History</h3>'+(r.length?r.map(function(x){return '<div class="row"><div><b>₹'+(x.amount/100).toFixed(2)+'</b><small>'+esc(x.upi)+'</small></div><span>'+esc(x.status)+'</span></div>'}).join(''):'<p class="mt">No requests yet.</p>')}).catch(function(){$('#sh').innerHTML='<h3>Payment History</h3><p class="mt">Could not load.</p>'})};
 var SUPPORT_EMAIL="travikaagems@gmail.com",me={};
 function info(t,h){sheet('<h3>'+t+'</h3>'+h)}
-$('#rf').onclick=function(){var c=curUser.uid.slice(0,7).toUpperCase(),t='Join me on DealKaro and earn on every deal. My code: '+c;
- sheet('<h3>Refer &amp; Earn</h3><div class="row"><div><b>'+c+'</b><small>Your code</small></div></div><button class="btn" id="cp">Copy code</button><button class="btn" id="wa">Share on WhatsApp</button><p class="mt">Referral bonus is launching soon. When it is live, the bonus will be added after your friend makes a first confirmed purchase. Amounts and rules may change.</p>');
- $('#cp').onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(c).then(function(){toast('Code copied')},function(){toast('Code: '+c)});else toast('Code: '+c)};
- $('#wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}};
 $('#ep').onclick=function(){sheet('<h3>Edit Profile</h3><input class="in" id="enm" value="'+esc(me.name||'')+'" placeholder="Your name" aria-label="Name"><input class="in" id="eup" value="'+esc(me.upi||'')+'" placeholder="UPI ID for payouts" aria-label="UPI ID"><button class="btn" id="sv">Save</button>');
  $('#sv').onclick=function(){var n=$('#enm').value.trim().slice(0,40),u=$('#eup').value.trim();if(u&&!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(u)){toast('Enter a valid UPI ID');return}
   uref.update({name:n,upi:u}).then(function(){me.name=n;me.upi=u;$('#nm').textContent=n||(curUser.email||'').split('@')[0];closeSheet();toast('Saved')}).catch(function(){toast('Could not save. Try again.')})}};
@@ -106,9 +150,9 @@ function enter(u){go('home');page('home');setBal(0);startAds();
   me=d;if(d.name)$('#nm').textContent=d.name;$('#pend').textContent=((d.pending||0)/100).toFixed(2);setBal(d.balance||0);if(d.stats)stats=d.stats;render()}).catch(function(){toast('Could not load wallet')});
  db.collection('deals').orderBy('order').get().then(function(q){if(q.empty)return;deals=q.docs.map(function(x){var d=x.data();return [d.category||'Other',d.store||'',d.title||'',d.cashback||'',d.link||'']});cur='All';render()}).catch(function(){})}
 /* banner ad (installed app only; test ids for now) */
-var ADMOB_BANNER="ca-app-pub-3940256099942544/6300978111",adOn=false;
+var ADMOB_BANNER="ca-app-pub-3775789465941687/1478778717",adOn=false;
 function startAds(){var C=window.Capacitor;if(adOn||!C||!C.isNativePlatform||!C.isNativePlatform())return;var A=C.Plugins&&C.Plugins.AdMob;if(!A)return;adOn=true;$('#app').classList.add('nat');
- A.initialize({initializeForTesting:true}).then(function(){return A.showBanner({adId:ADMOB_BANNER,adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:64,isTesting:true})}).catch(function(){adOn=false})}
+ A.initialize({initializeForTesting:true}).then(function(){return A.showBanner({adId:ADMOB_BANNER,adSize:'BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:true})}).catch(function(){adOn=false})}
 render();
 setInterval(function(){var b=$('#bn');if(b&&$('#p-home').classList.contains('on')){var w=b.clientWidth+10;b.scrollTo({left:b.scrollLeft+w>=b.scrollWidth-5?0:b.scrollLeft+w,behavior:'smooth'})}},3500);
 }
@@ -121,4 +165,4 @@ function sp(t){var p=document.querySelector('#splash p');if(p&&!window.__booted)
 window.addEventListener('error',function(e){sp('Error: '+(e.message||'script failed'))});
 setTimeout(function(){sp('Still loading… check your internet')},9000);
 tryBase(0);
-  
+ 
