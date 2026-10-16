@@ -43,6 +43,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 .scrow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
 .sc{flex:0 0 150px;background:var(--card);border-radius:16px;box-shadow:0 4px 0 var(--line);padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left}
 .sc b{font:800 16px 'Bricolage Grotesque',sans-serif}.sc em{font-style:normal;color:var(--pk);font-weight:700;font-size:13px}
+.hero2{background:linear-gradient(135deg,#FF2D87,#7A1FFF);color:#fff;border-radius:18px;padding:22px;text-align:center;margin:14px 0;display:flex;flex-direction:column;gap:4px}.hero2 b{font:800 34px 'Bricolage Grotesque',sans-serif}.hero2 span{opacity:.9;font-size:14px}
+.sec{font:800 17px 'Bricolage Grotesque',sans-serif;margin:18px 0 8px}
 .btn{background:var(--or);color:var(--cb);font:800 18px 'Bricolage Grotesque';padding:14px;border-radius:14px;width:100%;box-shadow:0 5px 0 #C99700}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #C99700}.btn:disabled{opacity:.5}
 .login{background:var(--cb);color:#fff;padding:28px;justify-content:center;gap:14px}.login h2{font-size:32px}
 .in{background:#fff;border:0;border-radius:14px;padding:14px;font:500 17px 'DM Sans';color:#0E1033;width:100%}
@@ -122,7 +124,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 </section>
 
 <section class="scr" id="home">
- <div class="hd"><button id="mn" aria-label="Menu">☰</button><h3>Deal<span>Karo</span></h3><div class="wal">₹<span id="bal">0.00</span></div></div>
+ <div class="hd"><button id="mn" aria-label="Menu">☰</button><button id="bk" aria-label="Back" style="display:none">←</button><h3 id="ttl">Deal<span>Karo</span></h3><div class="wal">₹<span id="bal">0.00</span></div></div>
  <div class="body">
   <div class="pg on" id="p-home">
    <button class="in sr" id="q" style="display:block;width:100%;text-align:left;color:var(--mute);font:500 16px 'DM Sans',sans-serif">Search for stores</button>
@@ -136,9 +138,10 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
   <div class="pg" id="p-partners"><div class="chips" id="sorts"></div><div id="plist"></div></div>
   <div class="pg" id="p-links">
    <div class="hero"><h3>Make your earning link</h3><input class="in" id="lk" placeholder="Paste a product or homepage link" aria-label="Link"><button class="btn" id="mk">Make link</button></div>
+   <div class="sec">Our partners</div><div class="chips" id="lkp"></div>
    <div class="steps"><div><b>1.</b> Copy a product link from a partner store</div><div><b>2.</b> Paste it here and make your link</div><div><b>3.</b> Share it. You earn when someone buys</div></div>
   </div>
-  <div class="pg" id="p-reports"><div class="st" id="st"></div><div class="ch"><b class="d">Last 7 days</b><div id="chart"></div></div><p class="mt">Reports update after orders are confirmed.</p></div>
+  <div class="pg" id="p-reports"><div class="hero2"><span>All-time earnings</span><b id="tot">₹0.00</b><span>Pending: ₹<span id="pend2">0.00</span></span></div><div class="st" id="st"></div><div class="ch"><b class="d">Last 7 days</b><div id="chart"></div></div><p class="mt">Reports update after orders are confirmed.</p></div>
   <div class="pg" id="p-me">
    <div class="pf"><div class="av" id="av">D</div><div><b class="d" id="nm"></b><small>User ID: <span id="uid"></span></small><small>Available: ₹<span id="bal2">0.00</span></small><small>Pending: ₹<span id="pend">0.00</span></small></div></div>
    <button class="row" id="ep"><div><b>Edit Profile</b></div><i>›</i></button>
@@ -165,4 +168,4 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-off
 <script>var __d=document.getElementById('dbg');if(__d)__d.textContent='html-ok ';window.onerror=function(m,u,l){var e=document.getElementById('dbg');if(e){e.textContent+=' ERR:'+m+'@'+l;e.style.display='block'}};setTimeout(function(){var sp=document.getElementById('splash');if(sp&&sp.classList.contains('on')&&__d)__d.style.display='block'},8000);</script>
 <script src="app.js" onerror="document.getElementById('dbg').textContent+=' app.js-missing'"></script>
 </body></html>
-     
+                                                                                       
