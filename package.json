@@ -5,7 +5,8 @@
   "dependencies": {
     "@capacitor-community/admob": "^7.0.0",
     "@capacitor/android": "^7.0.0",
-    "@capacitor/core": "^7.0.0"
+    "@capacitor/core": "^7.0.0",
+    "firebase": "10.12.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0"
