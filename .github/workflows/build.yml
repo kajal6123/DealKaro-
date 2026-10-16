@@ -13,7 +13,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - run: mkdir -p www && cp index.html www/index.html
+      - run: mkdir -p www && cp index.html app.js www/ && (base64 -d icon.b64 > www/logo.webp || true)
       - run: npm install
       - run: cp node_modules/firebase/firebase-app-compat.js node_modules/firebase/firebase-auth-compat.js node_modules/firebase/firebase-firestore-compat.js www/ || true
       - run: npx cap add android
